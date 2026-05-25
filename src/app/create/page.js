@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { UploadCloud, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { getSessionId } from '@/lib/session';
 
 export default function CreateDeck() {
   const router = useRouter();
@@ -48,6 +49,7 @@ export default function CreateDeck() {
     data.append('cardType', formData.cardType);
     data.append('difficulty', formData.difficulty);
     data.append('numberOfCards', formData.numberOfCards);
+    data.append('sessionId', getSessionId());
 
     try {
       const res = await fetch('/api/generate', {

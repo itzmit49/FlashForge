@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ChevronLeft, ChevronRight, Shuffle, CheckCircle, Download, FileText } from 'lucide-react';
 import Link from 'next/link';
+import { getSessionId } from '@/lib/session';
 
 export default function StudyDeck() {
   const { id } = useParams();
@@ -25,7 +26,7 @@ export default function StudyDeck() {
 
   const fetchDeck = async () => {
     try {
-      const res = await fetch(`/api/decks/${id}`);
+      const res = await fetch(`/api/decks/${id}?sessionId=${getSessionId()}`);
       if (!res.ok) throw new Error('Failed to load deck');
       const data = await res.json();
       setDeck(data.deck);
@@ -68,7 +69,7 @@ export default function StudyDeck() {
     
     // In background, update the deck
     try {
-      await fetch(`/api/decks/${id}`, {
+      await fetch(`/api/decks/${id}?sessionId=${getSessionId()}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cards: updatedCards })

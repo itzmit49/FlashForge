@@ -18,6 +18,11 @@ export async function POST(req) {
     const cardType = formData.get('cardType') || 'mixed';
     const difficulty = formData.get('difficulty') || 'medium';
     const numberOfCards = parseInt(formData.get('numberOfCards') || '10', 10);
+    const sessionId = formData.get('sessionId');
+
+    if (!sessionId) {
+      return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
+    }
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
@@ -97,6 +102,7 @@ ${truncatedText}
 
     // Save Deck to MongoDB
     const newDeck = new Deck({
+      sessionId,
       title,
       learningGoal,
       difficulty,

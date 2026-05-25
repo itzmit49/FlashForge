@@ -7,11 +7,17 @@ export const dynamic = 'force-dynamic';
 export async function GET(req, { params }) {
   try {
     const { id } = await params;
+    const sessionId = req.nextUrl.searchParams.get('sessionId');
+
     await connectToDatabase();
     
     const deck = await Deck.findById(id);
     if (!deck) {
       return NextResponse.json({ error: 'Deck not found' }, { status: 404 });
+    }
+
+    if (deck.sessionId !== sessionId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
     
     return NextResponse.json({ success: true, deck }, { status: 200 });
@@ -24,12 +30,20 @@ export async function GET(req, { params }) {
 export async function DELETE(req, { params }) {
   try {
     const { id } = await params;
+    const sessionId = req.nextUrl.searchParams.get('sessionId');
+
     await connectToDatabase();
     
-    const deletedDeck = await Deck.findByIdAndDelete(id);
-    if (!deletedDeck) {
+    const deck = await Deck.findById(id);
+    if (!deck) {
       return NextResponse.json({ error: 'Deck not found' }, { status: 404 });
     }
+
+    if (deck.sessionId !== sessionId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    await Deck.findByIdAndDelete(id);
     
     return NextResponse.json({ success: true, message: 'Deck deleted successfully' }, { status: 200 });
   } catch (error) {
@@ -41,14 +55,21 @@ export async function DELETE(req, { params }) {
 export async function PUT(req, { params }) {
   try {
     const { id } = await params;
+    const sessionId = req.nextUrl.searchParams.get('sessionId');
     const body = await req.json();
     
     await connectToDatabase();
     
-    const updatedDeck = await Deck.findByIdAndUpdate(id, body, { new: true });
-    if (!updatedDeck) {
+    const deck = await Deck.findById(id);
+    if (!deck) {
       return NextResponse.json({ error: 'Deck not found' }, { status: 404 });
     }
+
+    if (deck.sessionId !== sessionId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    const updatedDeck = await Deck.findByIdAndUpdate(id, body, { new: true });
     
     return NextResponse.json({ success: true, deck: updatedDeck }, { status: 200 });
   } catch (error) {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, BookOpen, Clock, Layers, Trash2 } from 'lucide-react';
+import { getSessionId } from '@/lib/session';
 
 export default function Dashboard() {
   const [decks, setDecks] = useState([]);
@@ -14,7 +15,7 @@ export default function Dashboard() {
 
   const fetchDecks = async () => {
     try {
-      const res = await fetch('/api/decks');
+      const res = await fetch(`/api/decks?sessionId=${getSessionId()}`);
       const data = await res.json();
       if (data.success) {
         setDecks(data.decks);
@@ -32,7 +33,7 @@ export default function Dashboard() {
     if (!confirm('Are you sure you want to delete this deck?')) return;
     
     try {
-      await fetch(`/api/decks/${id}`, { method: 'DELETE' });
+      await fetch(`/api/decks/${id}?sessionId=${getSessionId()}`, { method: 'DELETE' });
       setDecks(decks.filter(d => d._id !== id));
     } catch (error) {
       console.error('Failed to delete deck:', error);

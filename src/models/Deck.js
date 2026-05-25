@@ -8,6 +8,7 @@ const FlashcardSchema = new mongoose.Schema({
 });
 
 const DeckSchema = new mongoose.Schema({
+  sessionId: { type: String, required: true },
   title: { type: String, required: true },
   learningGoal: { type: String },
   difficulty: { type: String },
