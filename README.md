@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+(The file `c:\Users\mit\OneDrive\Desktop\FlashForge\README.md` exists, but is empty)
+# FlashForge
 
-## Getting Started
+FlashForge is a lightweight flashcard generator and study app. Upload PDFs or create decks manually, then study using generated flashcards. The project includes a Node.js + Express backend (with Mongoose) and a Vite + React frontend.
 
-First, run the development server:
+## Features
+- Upload a PDF and generate flashcards using Google Generative AI (Gemini).
+- Create, read, update, and delete decks.
+- Simple per-session deck isolation via `sessionId`.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Tech stack
+- Backend: Node.js, Express, Mongoose
+- Frontend: React (Vite)
+- AI integration: `@google/generative-ai` (Gemini model)
+
+## Repository structure
+
+- `backend/` — Express API and data models
+	- `server.js` — app entrypoint
+	- `config/db.js` — MongoDB connection (uses `MONGODB_URI`)
+	- `models/Deck.js` — Mongoose schema for decks
+	- `routes/decks.js` — REST endpoints for deck CRUD
+	- `routes/generate.js` — PDF upload + Gemini generation endpoint
+- `frontend/` — Vite + React app
+	- `src/pages/` — `CreateDeck`, `Dashboard`, `StudyDeck` pages
+
+## Environment variables
+Create a `.env` file in the `backend/` folder with at least:
+
+```
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster0.example.mongodb.net/flashforge
+GEMINI_API_KEY=your_gemini_api_key_here
+PORT=3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup & Run
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Backend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+cd backend
+npm install
+# development
+npm run dev
+# or start
+npm start
+```
 
-## Learn More
+Frontend
 
-To learn more about Next.js, take a look at the following resources:
+```
+cd frontend
+npm install
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open the frontend dev server (Vite) URL shown in the terminal.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API Overview
 
-## Deploy on Vercel
+- GET `/api/decks?sessionId=<sessionId>`
+	- Returns all decks for the session.
+- GET `/api/decks/:id?sessionId=<sessionId>`
+	- Returns a specific deck.
+- PUT `/api/decks/:id?sessionId=<sessionId>`
+	- Update deck (JSON body).
+- DELETE `/api/decks/:id?sessionId=<sessionId>`
+	- Delete a deck.
+- POST `/api/generate`
+	- Multipart/form-data upload. Fields:
+		- `file` — PDF file (required)
+		- `sessionId` — session identifier (required)
+		- `title`, `learningGoal`, `cardType`, `difficulty`, `numberOfCards` — optional generation settings
+	- Returns created deck (stored in MongoDB).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Note: many endpoints expect `sessionId` to scope decks to a user/session.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Development notes
+- Backend scripts: see `backend/package.json` (`dev` and `start` both run `server.js`).
+- Frontend scripts: see `frontend/package.json` (`dev`, `build`, `preview`).
+- DB connection lives in `backend/config/db.js` and reads `MONGODB_URI`.
+
+## Contributing
+- Fork the repo, create a feature branch, and open a PR.
+
+## License
+This project is provided as-is. Add a license if you plan to open-source it.
+
